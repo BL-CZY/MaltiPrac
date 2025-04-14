@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MaltiPrak</string>
+    <string name="title">Merħba</string>
+    <string name="reading">Qari</string>
+    <string name="listening">Smigħ</string>
+    <string name="speaking">Taħdit</string>
+    <string name="writing">Kitba</string>
+</resources>

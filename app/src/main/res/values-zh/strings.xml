@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MaltiPrac</string>
+    <string name="title">欢迎</string>
+    <string name="reading">阅读</string>
+    <string name="listening">听力</string>
+    <string name="speaking">口语</string>
+    <string name="writing">写作</string>
+</resources>

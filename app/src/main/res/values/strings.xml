@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MaltiPrac</string>
+    <string name="title">Welcome</string>
+    <string name="reading">Reading</string>
+    <string name="listening">listening</string>
+    <string name="speaking">speaking</string>
+    <string name="writing">writing</string>
+</resources>
