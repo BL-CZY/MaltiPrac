@@ -19,14 +19,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.blczy.maltiprac.LocalNavController
 import com.blczy.maltiprac.R
 import com.blczy.maltiprac.components.Nav
 import com.blczy.maltiprac.ui.theme.MaltiPracTheme
 
 @Composable
-fun GridButton(text: String) {
+fun GridButton(text: String, navigator: NavController) {
     Button(
-        onClick = {},
+        onClick = {
+            navigator.navigate(text)
+        },
         shape = RoundedCornerShape(5.dp),
         modifier = Modifier
             .aspectRatio(1f) // Makes the button square by setting equal width and height
@@ -46,6 +50,7 @@ fun GridButton(text: String) {
 
 @Composable
 fun HomeScreen() {
+    val navController = LocalNavController.current
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter
@@ -75,16 +80,28 @@ fun HomeScreen() {
                     modifier = Modifier.padding(top = 48.dp) // Add some space below title
                 ) {
                     item {
-                        GridButton(stringResource(R.string.reading))
+                        GridButton(
+                            stringResource(R.string.reading),
+                            navController
+                        )
                     }
                     item {
-                        GridButton(stringResource(R.string.listening))
+                        GridButton(
+                            stringResource(R.string.listening),
+                            navController
+                        )
                     }
                     item {
-                        GridButton(stringResource(R.string.speaking))
+                        GridButton(
+                            stringResource(R.string.speaking),
+                            navController
+                        )
                     }
                     item {
-                        GridButton(stringResource(R.string.writing))
+                        GridButton(
+                            stringResource(R.string.writing),
+                            navController
+                        )
                     }
                 }
             }

@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.blczy.maltiprac.LocalNavController
 import com.blczy.maltiprac.R
 import com.blczy.maltiprac.ui.theme.MaltiPracTheme
 
@@ -92,6 +93,8 @@ fun BottomNav() {
 fun NavButton(
     icon: ImageVector, label: String, isCenter: Boolean = false
 ) {
+    val navController = LocalNavController.current
+
     val buttonModifier = if (isCenter) {
         Modifier
             .size(56.dp)
@@ -108,7 +111,11 @@ fun NavButton(
         verticalArrangement = Arrangement.Center
     ) {
         IconButton(
-            onClick = { /* Handle click */ }, modifier = buttonModifier
+            onClick = {
+                if (isCenter) {
+                    navController.navigate("home")
+                }
+            }, modifier = buttonModifier
         ) {
             Icon(
                 imageVector = icon,
