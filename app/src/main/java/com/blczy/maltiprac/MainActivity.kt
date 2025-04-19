@@ -34,6 +34,16 @@ val LocalNavController = compositionLocalOf<NavController> {
     )
 }
 
+@Composable
+fun PreviewWrapper(content: @Composable () -> Unit) {
+    MaltiPracTheme {
+        val navController = rememberNavController()
+        CompositionLocalProvider(LocalNavController provides navController) {
+            content()
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun MainApp() {

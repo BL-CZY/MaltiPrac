@@ -21,9 +21,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.blczy.maltiprac.LocalNavController
+import com.blczy.maltiprac.PreviewWrapper
 import com.blczy.maltiprac.R
 import com.blczy.maltiprac.components.Nav
-import com.blczy.maltiprac.ui.theme.MaltiPracTheme
 
 @Composable
 fun GridButton(text: String, navigator: NavController) {
@@ -119,7 +119,7 @@ fun HomeScreen() {
 @Preview(showBackground = true)
 @Composable
 fun HomePreview() {
-    MaltiPracTheme {
+    PreviewWrapper {
         HomeScreen()
     }
 }
