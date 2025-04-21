@@ -6,4 +6,7 @@
     <string name="listening">Smigħ</string>
     <string name="speaking">Taħdit</string>
     <string name="writing">Kitba</string>
+    <string name="psm_title">PSMijiet:</string>
+    <string name="psm_topic_shopping">xiri</string>
+    <string name="psm_0_description">tixtara ħwejjex</string>
 </resources>

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.blczy.maltiprac.LocalNavController
 import com.blczy.maltiprac.PreviewWrapper
 import com.blczy.maltiprac.R
+import com.blczy.maltiprac.navigation.Route
 
 @Composable
 fun Nav() {
@@ -123,7 +124,7 @@ fun NavButton(
         IconButton(
             onClick = {
                 if (isCenter) {
-                    navController.navigate("home")
+                    navController.navigate(Route.HOME.route)
                 }
             }, modifier = buttonModifier
         ) {

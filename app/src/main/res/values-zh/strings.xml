@@ -6,4 +6,7 @@
     <string name="listening">听力</string>
     <string name="speaking">口语</string>
     <string name="writing">写作</string>
+    <string name="psm_title">PSMs:</string>
+    <string name="psm_topic_shopping">购物</string>
+    <string name="psm_0_description">购买蔬菜</string>
 </resources>
