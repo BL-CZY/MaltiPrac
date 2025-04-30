@@ -4,23 +4,22 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.blczy.maltiprac.animation.springTransition
 import com.blczy.maltiprac.home.HomeScreen
 import com.blczy.maltiprac.listening.Listening
-import com.blczy.maltiprac.listening.ListeningCategories
-import com.blczy.maltiprac.listening.ShowPsm
-import com.blczy.maltiprac.navigation.Route
+import com.blczy.maltiprac.navigation.NavContext
 import com.blczy.maltiprac.ui.theme.MaltiPracTheme
 
 class MainActivity : ComponentActivity() {
@@ -33,17 +32,29 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-val LocalNavController = compositionLocalOf<NavController> {
+var LocalNavContext = compositionLocalOf<NavContext> {
     error(
-        "No NavController " + "found" + ""
+        "No NavContext found"
+    )
+}
+
+var LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope> {
+    error(
+        "No SharedTransitionScope found"
+    )
+}
+
+var LocalAnimatedVisibilityScope = compositionLocalOf<AnimatedVisibilityScope> {
+    error(
+        "No AnimatedVisibilityScope found"
     )
 }
 
 @Composable
 fun PreviewWrapper(content: @Composable () -> Unit) {
     MaltiPracTheme {
-        val navController = rememberNavController()
-        CompositionLocalProvider(LocalNavController provides navController) {
+        var navContext = NavContext.Home()
+        CompositionLocalProvider(LocalNavContext provides navContext) {
             content()
         }
     }
@@ -52,146 +63,26 @@ fun PreviewWrapper(content: @Composable () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun MainApp() {
+    var navContext by remember { mutableStateOf<NavContext>(NavContext.Home()) }
     MaltiPracTheme {
-        val navController = rememberNavController()
-        CompositionLocalProvider(
-            LocalNavController provides navController
-        ) {
-            NavHost(
-                navController = navController, startDestination = Route.HOME.route
-            ) {
-                composable(
-                    route = Route.HOME.route,
-                    enterTransition = {
-                        when (initialState.destination.route) {
-                            Route.LISTENING.route,
-                            Route.LISTENING_CATEGORIES.route,
-                            "${Route.LISTENING_CATEGORIES.route}/{category}",
-                            Route.LISTENING_PSM.route,
-                            "${Route.LISTENING_PSM.route}/{id}" ->
-                                slideIntoContainer(
-                                    AnimatedContentTransitionScope.SlideDirection.Up,
-                                    animationSpec = springTransition()
-                                )
-                            else -> null
-                        }
-                    },
-                    exitTransition = {
-                        when (targetState.destination.route) {
-                            Route.LISTENING.route ->
-                                slideOutOfContainer(
-                                    AnimatedContentTransitionScope.SlideDirection.Left,
-                                    animationSpec = springTransition()
-                                )
-                            else -> null
-                        }
-                    }
+        SharedTransitionLayout {
+            AnimatedContent(navContext, label = "test") { targetState ->
+                CompositionLocalProvider(
+                    LocalSharedTransitionScope provides this@SharedTransitionLayout,
+                    LocalAnimatedVisibilityScope provides this@AnimatedContent,
+                    LocalNavContext provides navContext,
                 ) {
-                    HomeScreen()
-                }
+                    val closure: (NavContext) -> Unit = { value -> navContext = value }
 
-                composable(
-                    route = Route.LISTENING.route,
-                    enterTransition = {
-                        when (initialState.destination.route) {
-                            Route.HOME.route ->
-                                slideIntoContainer(
-                                    AnimatedContentTransitionScope.SlideDirection.Left,
-                                    animationSpec = springTransition()
-                                )
-                            "${Route.LISTENING_CATEGORIES.route}/{category}" ->
-                                slideIntoContainer(
-                                    AnimatedContentTransitionScope.SlideDirection.Right,
-                                    animationSpec = springTransition()
-                                )
-                            else -> null
+                    when (targetState) {
+                        is NavContext.Home -> {
+                            HomeScreen(setNavContext = closure)
                         }
-                    },
-                    exitTransition = {
-                        when (targetState.destination.route) {
-                            "${Route.LISTENING_CATEGORIES.route}/{category}" ->
-                                slideOutOfContainer(
-                                    AnimatedContentTransitionScope.SlideDirection.Left,
-                                    animationSpec = springTransition()
-                                )
 
-                            Route.HOME.route -> slideOutOfContainer(
-                                AnimatedContentTransitionScope.SlideDirection.Up,
-                                animationSpec = springTransition()
-                            )
-                            else -> null
+                        is NavContext.Listening -> {
+                            Listening(setNavContext = closure)
                         }
                     }
-                ) {
-                    Listening()
-                }
-
-                // Categories Screen
-                composable(
-                    route = "${Route.LISTENING_CATEGORIES.route}/{category}",
-                    arguments = listOf(navArgument("category") { type = NavType.StringType }),
-                    enterTransition = {
-                        when (initialState.destination.route) {
-                            Route.LISTENING.route ->
-                                slideIntoContainer(
-                                    AnimatedContentTransitionScope.SlideDirection.Left,
-                                    animationSpec = springTransition()
-                                )
-                            "${Route.LISTENING_PSM.route}/{id}" ->
-                                slideIntoContainer(
-                                    AnimatedContentTransitionScope.SlideDirection.Right,
-                                    animationSpec = springTransition()
-                                )
-                            else -> null
-                        }
-                    },
-                    exitTransition = {
-                        when (targetState.destination.route) {
-                            Route.LISTENING.route ->
-                                slideOutOfContainer(
-                                    AnimatedContentTransitionScope.SlideDirection.Right,
-                                    animationSpec = springTransition()
-                                )
-                            "${Route.LISTENING_PSM.route}/{id}" ->
-                                slideOutOfContainer(
-                                    AnimatedContentTransitionScope.SlideDirection.Left,
-                                    animationSpec = springTransition()
-                                )
-                            else -> null
-                        }
-                    }
-                ) { backStackEntry ->
-                    val category = backStackEntry.arguments?.getString("category")
-                    ListeningCategories(category ?: "")
-                }
-
-                // PSM Screen
-                composable(
-                    route = "${Route.LISTENING_PSM.route}/{id}",
-                    arguments = listOf(navArgument("id") { type = NavType.IntType }),
-                    enterTransition = {
-                        when (initialState.destination.route) {
-                            "${Route.LISTENING_CATEGORIES.route}/{category}" ->
-                                slideIntoContainer(
-                                    AnimatedContentTransitionScope.SlideDirection.Left,
-                                    animationSpec = springTransition()
-                                )
-                            else -> null
-                        }
-                    },
-                    exitTransition = {
-                        when (targetState.destination.route) {
-                            "${Route.LISTENING_CATEGORIES.route}/{category}" ->
-                                slideOutOfContainer(
-                                    AnimatedContentTransitionScope.SlideDirection.Right,
-                                    animationSpec = springTransition()
-                                )
-                            else -> null
-                        }
-                    }
-                ) { backStackEntry ->
-                    val id = backStackEntry.arguments?.getInt("id")
-                    ShowPsm(id ?: 0)
                 }
             }
         }

@@ -20,6 +20,13 @@ android {
             "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    kotlinOptions {
+        freeCompilerArgs += listOf(
+            "-opt-in=androidx.compose.animation.ExperimentalSharedTransitionApi",
+            // Any other opt-ins you might need
+        )
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false

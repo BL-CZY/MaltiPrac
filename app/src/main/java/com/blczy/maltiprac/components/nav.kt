@@ -26,23 +26,25 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.blczy.maltiprac.LocalNavController
 import com.blczy.maltiprac.PreviewWrapper
 import com.blczy.maltiprac.R
-import com.blczy.maltiprac.navigation.Route
+import com.blczy.maltiprac.navigation.NavContext
 
 @Composable
-fun Nav() {
+fun Nav(
+    setNavContext: (NavContext) -> Unit = { _ -> }
+) {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter
+        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
     ) {
-        BottomNav()
+        BottomNav(setNavContext)
     }
 }
 
 @Composable
-fun BottomNav() {
+fun BottomNav(
+    setNavContext: (NavContext) -> Unit
+) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -57,43 +59,48 @@ fun BottomNav() {
         ) {
             // Left section - 2 buttons
             Row(
-                modifier = Modifier.weight(2f),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.weight(2f), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 NavButton(
                     icon = Icons.Default.Home,
-                    label = stringResource(R.string.reading)
+                    label = stringResource(R.string.reading),
+                    setNavContext = setNavContext,
                 )
                 NavButton(
                     icon = Icons.Default.Search,
-                    label = stringResource(R.string.listening)
+                    label = stringResource(R.string.listening),
+                    setNavContext = setNavContext,
                 )
             }
 
             // Middle section - 1 button
             Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.weight(1f), contentAlignment = Alignment.Center
             ) {
                 NavButton(
                     icon = Icons.Default.Home,
                     label = "Add",
-                    isCenter = true
+                    isCenter = true,
+
+                    setNavContext = setNavContext,
                 )
             }
 
             // Right section - 2 buttons
             Row(
-                modifier = Modifier.weight(2f),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.weight(2f), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 NavButton(
                     icon = Icons.Default.Notifications,
-                    label = stringResource(R.string.speaking)
+                    label = stringResource(R.string.speaking),
+
+                    setNavContext = setNavContext,
                 )
                 NavButton(
                     icon = Icons.Default.Person,
-                    label = stringResource(R.string.writing)
+                    label = stringResource(R.string.writing),
+
+                    setNavContext = setNavContext,
                 )
             }
         }
@@ -102,29 +109,25 @@ fun BottomNav() {
 
 @Composable
 fun NavButton(
-    icon: ImageVector, label: String, isCenter: Boolean = false
+    icon: ImageVector, label: String, isCenter: Boolean = false, setNavContext: (NavContext) -> Unit
 ) {
-    val navController = LocalNavController.current
-
     val buttonModifier = if (isCenter) {
         Modifier
             .size(56.dp)
             .background(
-                color = MaterialTheme.colorScheme.primary,
-                shape = MaterialTheme.shapes.medium
+                color = MaterialTheme.colorScheme.primary, shape = MaterialTheme.shapes.medium
             )
     } else {
         Modifier
     }
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
     ) {
         IconButton(
             onClick = {
                 if (isCenter) {
-                    navController.navigate(Route.HOME.route)
+                    setNavContext(NavContext.Home())
                 }
             }, modifier = buttonModifier
         ) {
