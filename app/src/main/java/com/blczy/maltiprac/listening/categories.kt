@@ -5,6 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.blczy.maltiprac.LocalNavController
+import com.blczy.maltiprac.components.Nav
 import com.blczy.maltiprac.navigation.Route
 
 @Composable
@@ -18,4 +19,6 @@ fun ListeningCategories(category: String) {
             Text(stringResource(psm.descriptionStringIndex))
         }
     }
+
+    Nav()
 }

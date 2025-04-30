@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.blczy.maltiprac.LocalNavController
 import com.blczy.maltiprac.PreviewWrapper
 import com.blczy.maltiprac.R
+import com.blczy.maltiprac.components.Nav
 import com.blczy.maltiprac.navigation.Route
 
 @Composable
@@ -29,6 +30,8 @@ fun Listening() {
             Text(stringResource(R.string.psm_topic_shopping))
         }
     }
+
+    Nav()
 }
 
 @Preview

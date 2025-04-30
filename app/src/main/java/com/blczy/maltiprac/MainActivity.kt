@@ -16,7 +16,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.blczy.maltiprac.animation.springTransition
-import com.blczy.maltiprac.components.Nav
 import com.blczy.maltiprac.home.HomeScreen
 import com.blczy.maltiprac.listening.Listening
 import com.blczy.maltiprac.listening.ListeningCategories
@@ -115,6 +114,11 @@ fun MainApp() {
                                     AnimatedContentTransitionScope.SlideDirection.Left,
                                     animationSpec = springTransition()
                                 )
+
+                            Route.HOME.route -> slideOutOfContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Up,
+                                animationSpec = springTransition()
+                            )
                             else -> null
                         }
                     }
@@ -190,7 +194,6 @@ fun MainApp() {
                     ShowPsm(id ?: 0)
                 }
             }
-            Nav()
         }
     }
 }
