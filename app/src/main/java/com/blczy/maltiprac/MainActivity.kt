@@ -2,6 +2,9 @@ package com.blczy.maltiprac
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContent
@@ -10,13 +13,13 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
 import com.blczy.maltiprac.home.HomeScreen
 import com.blczy.maltiprac.listening.Listening
 import com.blczy.maltiprac.navigation.NavContext
@@ -60,10 +63,34 @@ fun PreviewWrapper(content: @Composable () -> Unit) {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
 fun MainApp() {
     var navContext by remember { mutableStateOf<NavContext>(NavContext.Home()) }
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val backCallback = remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                when (navContext) {
+                    is NavContext.Listening -> {
+                        navContext = NavContext.Home()
+                    }
+                    else -> {
+                        isEnabled = false
+                        backDispatcher?.onBackPressed()
+                    }
+                }
+            }
+        }
+    }
+
+    // Register and clean up the callback
+    DisposableEffect(backDispatcher) {
+        backDispatcher?.addCallback(backCallback)
+        onDispose {
+            backCallback.remove()
+        }
+    }
+
     MaltiPracTheme {
         SharedTransitionLayout {
             AnimatedContent(navContext, label = "test") { targetState ->
