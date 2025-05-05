@@ -21,6 +21,8 @@ import androidx.compose.runtime.setValue
 import com.blczy.maltiprac.home.HomeScreen
 import com.blczy.maltiprac.listening.Listening
 import com.blczy.maltiprac.listening.ListeningCategories
+import com.blczy.maltiprac.listening.ShowPsm
+import com.blczy.maltiprac.navigation.ListeningCategoryContext
 import com.blczy.maltiprac.navigation.NavContext
 import com.blczy.maltiprac.ui.theme.MaltiPracTheme
 
@@ -78,6 +80,11 @@ fun MainApp() {
                         navContext = NavContext.Listening()
                     }
 
+                    is NavContext.Psm -> {
+                        navContext =
+                            NavContext.ListeningCategory(context = ListeningCategoryContext(category = (navContext as NavContext.Psm).context.category))
+                    }
+
                     else -> {
                         // tell the system that this callback will be invalidated
                         isEnabled = false
@@ -116,7 +123,13 @@ fun MainApp() {
                         }
 
                         is NavContext.ListeningCategory -> {
-                            ListeningCategories(targetState.context.category)
+                            ListeningCategories(
+                                targetState.context.category, setNavContext = closure
+                            )
+                        }
+
+                        is NavContext.Psm -> {
+                            ShowPsm(targetState.context.id)
                         }
                     }
                 }

@@ -26,9 +26,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blczy.maltiprac.LocalAnimatedVisibilityScope
 import com.blczy.maltiprac.LocalSharedTransitionScope
+import com.blczy.maltiprac.PreviewWrapper
 import com.blczy.maltiprac.R
 import com.blczy.maltiprac.navigation.NavContext
 
@@ -41,10 +43,13 @@ fun Nav(
 
     with(sharedTransitionScope) {
         Box(
-            modifier = Modifier.sharedElement(
-                rememberSharedContentState(key = "nav"),
-                animatedVisibilityScope = animatedVisibilityScope
-            ).fillMaxSize(), contentAlignment = Alignment.BottomCenter
+            modifier = Modifier
+                .sharedElement(
+                    rememberSharedContentState(
+                        key = "nav",
+                    ), animatedVisibilityScope = animatedVisibilityScope
+                )
+                .fillMaxSize(), contentAlignment = Alignment.BottomCenter
         ) {
             BottomNav(setNavContext)
         }
@@ -157,11 +162,11 @@ fun NavButton(
         }
     }
 }
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun NavPreview() {
-//    PreviewWrapper {
-//        Nav()
-//    }
-//}
+
+@Preview(showBackground = true)
+@Composable
+fun NavPreview() {
+    PreviewWrapper {
+        Nav()
+    }
+}

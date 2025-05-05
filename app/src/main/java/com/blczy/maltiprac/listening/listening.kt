@@ -1,6 +1,5 @@
 package com.blczy.maltiprac.listening
 
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
@@ -10,7 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.blczy.maltiprac.LocalSharedTransitionScope
 import com.blczy.maltiprac.PreviewWrapper
 import com.blczy.maltiprac.R
 import com.blczy.maltiprac.components.Nav
