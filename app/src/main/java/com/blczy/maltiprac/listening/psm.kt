@@ -24,8 +24,65 @@ data class Stop(
 
 class Psm(private val context: Context, val index: Int) {
     companion object {
-        private const val BASE_FILE_URL = "https://raw.githubusercontent.com/BL-CZY/malti_practice_files/master/"
+        private const val BASE_FILE_URL =
+            "https://raw.githubusercontent.com/BL-CZY/malti_practice_files/master/"
         private const val TAG = "PsmManager"
+
+
+        /**
+         * Recursively deletes a directory and all its contents.
+         *
+         * @param directory The directory to delete
+         * @return true if the deletion was successful, false otherwise
+         */
+        private fun deleteDirectoryContents(directory: File): Boolean {
+            if (!directory.exists()) {
+                return true
+            }
+
+            var result = true
+
+            // Get all files and subdirectories
+            directory.listFiles()?.forEach { file ->
+                if (file.isDirectory) {
+                    // Recursively delete contents of subdirectory
+                    val subDirResult = deleteDirectoryContents(file)
+                    // Delete the now-empty subdirectory
+                    val deleted = file.delete()
+                    result = result && subDirResult && deleted
+                } else {
+                    // Delete file
+                    val deleted = file.delete()
+                    result = result && deleted
+                }
+            }
+
+            return result
+        }
+
+        /**
+         * Removes all content under the psms/ directory in the app's files directory.
+         *
+         * @param context The Android application context
+         * @return true if the cleanup was successful, false otherwise
+         */
+        fun cleanupPsmDirectory(context: Context): Boolean {
+            try {
+                val psmBaseDirectory = File(context.filesDir, "psms")
+
+                // Check if the directory exists
+                if (!psmBaseDirectory.exists()) {
+                    // Nothing to delete, consider it a success
+                    return true
+                }
+
+                // Delete all contents recursively
+                return deleteDirectoryContents(psmBaseDirectory)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return false
+            }
+        }
     }
 
     /**

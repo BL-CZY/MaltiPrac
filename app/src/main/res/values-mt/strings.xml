@@ -8,5 +8,6 @@
     <string name="writing">Kitba</string>
     <string name="psm_title">PSMijiet:</string>
     <string name="psm_topic_shopping">xiri</string>
-    <string name="psm_0_description">tixtara ħwejjex</string>
+    <string name="psm_0_description">tixtara ħxejjex</string>
+    <string name="clear_psm">neħħa</string>
 </resources>
