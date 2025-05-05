@@ -3,7 +3,6 @@ package com.blczy.maltiprac
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -19,9 +18,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.tooling.preview.Preview
 import com.blczy.maltiprac.home.HomeScreen
 import com.blczy.maltiprac.listening.Listening
+import com.blczy.maltiprac.listening.ListeningCategories
 import com.blczy.maltiprac.navigation.NavContext
 import com.blczy.maltiprac.ui.theme.MaltiPracTheme
 
@@ -74,7 +73,13 @@ fun MainApp() {
                     is NavContext.Listening -> {
                         navContext = NavContext.Home()
                     }
+
+                    is NavContext.ListeningCategory -> {
+                        navContext = NavContext.Listening()
+                    }
+
                     else -> {
+                        // tell the system that this callback will be invalidated
                         isEnabled = false
                         backDispatcher?.onBackPressed()
                     }
@@ -108,6 +113,10 @@ fun MainApp() {
 
                         is NavContext.Listening -> {
                             Listening(setNavContext = closure)
+                        }
+
+                        is NavContext.ListeningCategory -> {
+                            ListeningCategories(targetState.context.category)
                         }
                     }
                 }

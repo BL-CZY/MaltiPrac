@@ -1,5 +1,7 @@
 package com.blczy.maltiprac.components
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,26 +26,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.blczy.maltiprac.PreviewWrapper
+import com.blczy.maltiprac.LocalAnimatedVisibilityScope
+import com.blczy.maltiprac.LocalSharedTransitionScope
 import com.blczy.maltiprac.R
 import com.blczy.maltiprac.navigation.NavContext
 
 @Composable
 fun Nav(
-    setNavContext: (NavContext) -> Unit = { _ -> }
+    setNavContext: (NavContext) -> Unit = { _ -> },
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
-    ) {
-        BottomNav(setNavContext)
+    val sharedTransitionScope: SharedTransitionScope = LocalSharedTransitionScope.current
+    val animatedVisibilityScope: AnimatedVisibilityScope = LocalAnimatedVisibilityScope.current
+
+    with(sharedTransitionScope) {
+        Box(
+            modifier = Modifier.sharedElement(
+                rememberSharedContentState(key = "nav"),
+                animatedVisibilityScope = animatedVisibilityScope
+            ).fillMaxSize(), contentAlignment = Alignment.BottomCenter
+        ) {
+            BottomNav(setNavContext)
+        }
     }
 }
 
 @Composable
 fun BottomNav(
-    setNavContext: (NavContext) -> Unit
+    setNavContext: (NavContext) -> Unit,
 ) {
     Surface(
         modifier = Modifier
@@ -147,11 +157,11 @@ fun NavButton(
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun NavPreview() {
-    PreviewWrapper {
-        Nav()
-    }
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun NavPreview() {
+//    PreviewWrapper {
+//        Nav()
+//    }
+//}

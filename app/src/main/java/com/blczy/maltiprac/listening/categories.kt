@@ -8,8 +8,12 @@ import com.blczy.maltiprac.LocalNavContext
 import com.blczy.maltiprac.components.Nav
 import com.blczy.maltiprac.navigation.Route
 
+enum class Category {
+    Shopping
+}
+
 @Composable
-fun ListeningCategories(category: String) {
+fun ListeningCategories(category: Category) {
     val indices = indicesMap[category]
     val navControl = LocalNavContext.current
     indices?.forEach { psm ->

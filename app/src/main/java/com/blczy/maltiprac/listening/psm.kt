@@ -1,8 +1,8 @@
 package com.blczy.maltiprac.listening
 
-import com.blczy.maltiprac.R
 import android.content.Context
 import android.util.Log
+import com.blczy.maltiprac.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -12,7 +12,7 @@ import okhttp3.Request
 import java.io.File
 import java.io.FileOutputStream
 
-val indicesMap = mapOf("shopping" to listOf(PsmDescriptor(R.string.psm_0_description, 0)))
+val indicesMap = mapOf(Category.Shopping to listOf(PsmDescriptor(R.string.psm_0_description, 0)))
 
 class PsmDescriptor(val descriptionStringIndex: Int, val index: Int) {}
 
