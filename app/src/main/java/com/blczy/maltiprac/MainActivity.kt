@@ -10,6 +10,10 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -18,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import com.blczy.maltiprac.home.HomeScreen
 import com.blczy.maltiprac.listening.Listening
 import com.blczy.maltiprac.listening.ListeningCategories
@@ -103,33 +108,36 @@ fun MainApp() {
         }
     }
 
+
     MaltiPracTheme {
-        SharedTransitionLayout {
-            AnimatedContent(navContext, label = "test") { targetState ->
-                CompositionLocalProvider(
-                    LocalSharedTransitionScope provides this@SharedTransitionLayout,
-                    LocalAnimatedVisibilityScope provides this@AnimatedContent,
-                    LocalNavContext provides navContext,
-                ) {
-                    val closure: (NavContext) -> Unit = { value -> navContext = value }
+        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+            SharedTransitionLayout {
+                AnimatedContent(navContext, label = "router") { targetState ->
+                    CompositionLocalProvider(
+                        LocalSharedTransitionScope provides this@SharedTransitionLayout,
+                        LocalAnimatedVisibilityScope provides this@AnimatedContent,
+                        LocalNavContext provides navContext,
+                    ) {
+                        val closure: (NavContext) -> Unit = { value -> navContext = value }
 
-                    when (targetState) {
-                        is NavContext.Home -> {
-                            HomeScreen(setNavContext = closure)
-                        }
+                        when (targetState) {
+                            is NavContext.Home -> {
+                                HomeScreen(setNavContext = closure)
+                            }
 
-                        is NavContext.Listening -> {
-                            Listening(setNavContext = closure)
-                        }
+                            is NavContext.Listening -> {
+                                Listening(setNavContext = closure)
+                            }
 
-                        is NavContext.ListeningCategory -> {
-                            ListeningCategories(
-                                targetState.context.category, setNavContext = closure
-                            )
-                        }
+                            is NavContext.ListeningCategory -> {
+                                ListeningCategories(
+                                    targetState.context.category, setNavContext = closure
+                                )
+                            }
 
-                        is NavContext.Psm -> {
-                            ShowPsm(targetState.context.id)
+                            is NavContext.Psm -> {
+                                ShowPsm(targetState.context.id)
+                            }
                         }
                     }
                 }

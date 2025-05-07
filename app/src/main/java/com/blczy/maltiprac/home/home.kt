@@ -1,6 +1,7 @@
 package com.blczy.maltiprac.home
 
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -74,6 +75,7 @@ fun HomeScreen(
                     Text(
                         text = stringResource(R.string.title),
                         style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier
                             .padding(bottom = 16.dp)
                             .align(Alignment.TopCenter),
