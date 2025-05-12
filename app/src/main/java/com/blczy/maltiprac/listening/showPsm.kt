@@ -2,14 +2,13 @@ package com.blczy.maltiprac.listening
 
 import android.content.Intent
 import android.media.MediaPlayer
-import android.net.Uri
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import android.view.ActionMode
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,6 +25,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.VolumeUp
 import androidx.compose.material.icons.filled.Forward10
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -57,15 +56,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.blczy.maltiprac.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -237,7 +239,7 @@ fun ShowPsm(id: Int, viewModel: PsmViewModel = viewModel()) {
                                 onClick = {
                                     mediaPlayer?.let { player ->
                                         val positionMs = (stop.audio_stop * 1000).toInt()
-                                        player.seekTo(positionMs)
+                                        player.seekTo(positionMs + 50)
                                         if (!isPlaying) {
                                             player.start()
                                             isPlaying = true
@@ -309,17 +311,15 @@ fun ShowPsm(id: Int, viewModel: PsmViewModel = viewModel()) {
     }
 }
 
+
 @Composable
 fun SentenceButton(
     sentence: String,
     isHighlighted: Boolean,
     onClick: () -> Unit
 ) {
-    var selectedText by remember { mutableStateOf("") }
-    var showSelectionPanel by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    // Function to open a URL
     val openUrl: (String) -> Unit = { url ->
         val intent = Intent(Intent.ACTION_VIEW).apply {
             data = url.toUri()
@@ -336,60 +336,35 @@ fun SentenceButton(
                 if (isHighlighted) MaterialTheme.colorScheme.primaryContainer
                 else MaterialTheme.colorScheme.surfaceVariant
             )
-            .clickable(onClick = onClick)
             .padding(16.dp)
+            .clickable(enabled = true, onClick = onClick)
     ) {
-        // Selectable Text
-        SelectableText(
-            text = sentence,
-            color = if (isHighlighted) MaterialTheme.colorScheme.onPrimaryContainer
-            else MaterialTheme.colorScheme.onSurfaceVariant,
-            onTextSelected = { selected ->
-                selectedText = selected
-                showSelectionPanel = selected.isNotBlank()
-            }
-        )
-
-        // Floating Selection Panel
-        AnimatedVisibility(
-            visible = showSelectionPanel,
-            enter = fadeIn(),
-            exit = fadeOut(),
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .offset(y = 16.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Wiktionary Link
-                Text(
-                    text = "Wiktionary",
-                    style = TextStyle(fontSize = 12.sp),
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .clickable {
-                            val wiktionaryUrl = "https://en.wiktionary.org/wiki/${selectedText}Maltese"
-                            openUrl(wiktionaryUrl)
-                        }
-                        .padding(8.dp)
+            // Selectable Text
+            Box(modifier = Modifier.weight(1f)) {
+                SelectableText(
+                    text = sentence,
+                    color = if (isHighlighted) MaterialTheme.colorScheme.onPrimaryContainer
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                    openUrl = openUrl,
                 )
+            }
 
-                // Google Translate Link
-                Text(
-                    text = "Translate",
-                    style = TextStyle(fontSize = 12.sp),
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .clickable {
-                            val translateUrl = "https://translate.google.com/?sl=en&tl=mt&text=${Uri.encode(selectedText)}&op=translate"
-                            openUrl(translateUrl)
-                        }
-                        .padding(8.dp)
+            // Icon Button
+            IconButton(
+                onClick = onClick,
+                modifier = Modifier.semantics {
+                    contentDescription = "Play sentence"
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.VolumeUp,
+                    contentDescription = null, // already defined in semantics
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -400,28 +375,62 @@ fun SentenceButton(
 fun SelectableText(
     text: String,
     color: Color,
-    onTextSelected: (String) -> Unit
+    openUrl: (String) -> Unit,
 ) {
-    var selectedWord by remember { mutableStateOf("") }
+    val wiktionarySearchTitle = stringResource(R.string.wiktionary)
+    val verbMtSearchTitle = stringResource(R.string.verb_mt)
+    AndroidView(factory = { context ->
+        TextView(context).apply {
+            setText(text)
+            setTextColor(color.toArgb())
+            setBackgroundColor(Color.Transparent.toArgb())
+            isFocusable = false
+            isFocusableInTouchMode = false
+            isLongClickable = true
+            isCursorVisible = false
+            isClickable = true
+            setTextIsSelectable(true)
 
-    Text(
-        text = text,
-        color = color,
-        modifier = Modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null
-        ) {
-            // If no word was previously selected or we want to reset
-            selectedWord = if (selectedWord.isEmpty()) {
-                text // Select entire text if no word was selected
-            } else {
-                "" // Deselect if already selected
+            customSelectionActionModeCallback = object : ActionMode.Callback {
+                override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                    menu?.add(0, 1, 0, wiktionarySearchTitle)
+                    menu?.add(0, 2, 1, verbMtSearchTitle)
+                    return true  // true to create the action mode
+                }
+
+                override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                    return false // No need to refresh
+                }
+
+                override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+                    val start = selectionStart
+                    val end = selectionEnd
+                    val selected = text.substring(start, end)
+
+                    when (item?.itemId) {
+                        1 -> {
+                            openUrl(
+                                "https://en.wiktionary.org/wiki/${
+                                    selected.trim().lowercase()
+                                }#Maltese"
+                            )
+                            mode?.finish()  // Close the selection menu
+                            return true
+                        }
+
+                        2 -> {
+                            openUrl("https://verb.mt/?s=${selected.trim().lowercase()}")
+                            mode?.finish()
+                            return true
+                        }
+                    }
+                    return false
+                }
+
+                override fun onDestroyActionMode(mode: ActionMode?) {}
             }
-
-            onTextSelected(selectedWord.trim())
-        },
-        overflow = TextOverflow.Visible,
-    )
+        }
+    })
 }
 
 @Composable

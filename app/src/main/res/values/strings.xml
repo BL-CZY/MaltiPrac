@@ -9,5 +9,7 @@
     <string name="psm_topic_shopping">Shopping</string>
     <string name="psm_0_description">Buying vegetables</string>
     <string name="clear_psm">Clear PSM</string>
+    <string name="wiktionary">Search on Wiktionary</string>
+    <string name="verb.mt">Search on verb.mt</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

@@ -10,4 +10,6 @@
     <string name="psm_topic_shopping">购物</string>
     <string name="psm_0_description">购买蔬菜</string>
     <string name="clear_psm">清除PSM</string>
+    <string name="wiktionary">在Wiktionary上搜索</string>
+    <string name="verb.mt">在verb.mt上搜索</string>
 </resources>
