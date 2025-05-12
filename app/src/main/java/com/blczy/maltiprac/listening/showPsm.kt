@@ -1,9 +1,15 @@
 package com.blczy.maltiprac.listening
 
+import android.content.Intent
 import android.media.MediaPlayer
+import android.net.Uri
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +18,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -51,7 +58,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -61,7 +72,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.util.Locale
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class PsmViewModel : ViewModel() {
     private val _stops = MutableStateFlow<List<Stop>>(emptyList())
@@ -303,6 +315,18 @@ fun SentenceButton(
     isHighlighted: Boolean,
     onClick: () -> Unit
 ) {
+    var selectedText by remember { mutableStateOf("") }
+    var showSelectionPanel by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    // Function to open a URL
+    val openUrl: (String) -> Unit = { url ->
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = url.toUri()
+        }
+        context.startActivity(intent)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -315,12 +339,89 @@ fun SentenceButton(
             .clickable(onClick = onClick)
             .padding(16.dp)
     ) {
-        Text(
+        // Selectable Text
+        SelectableText(
             text = sentence,
             color = if (isHighlighted) MaterialTheme.colorScheme.onPrimaryContainer
-            else MaterialTheme.colorScheme.onSurfaceVariant
+            else MaterialTheme.colorScheme.onSurfaceVariant,
+            onTextSelected = { selected ->
+                selectedText = selected
+                showSelectionPanel = selected.isNotBlank()
+            }
         )
+
+        // Floating Selection Panel
+        AnimatedVisibility(
+            visible = showSelectionPanel,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .offset(y = 16.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Wiktionary Link
+                Text(
+                    text = "Wiktionary",
+                    style = TextStyle(fontSize = 12.sp),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .clickable {
+                            val wiktionaryUrl = "https://en.wiktionary.org/wiki/${selectedText}Maltese"
+                            openUrl(wiktionaryUrl)
+                        }
+                        .padding(8.dp)
+                )
+
+                // Google Translate Link
+                Text(
+                    text = "Translate",
+                    style = TextStyle(fontSize = 12.sp),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .clickable {
+                            val translateUrl = "https://translate.google.com/?sl=en&tl=mt&text=${Uri.encode(selectedText)}&op=translate"
+                            openUrl(translateUrl)
+                        }
+                        .padding(8.dp)
+                )
+            }
+        }
     }
+}
+
+@Composable
+fun SelectableText(
+    text: String,
+    color: Color,
+    onTextSelected: (String) -> Unit
+) {
+    var selectedWord by remember { mutableStateOf("") }
+
+    Text(
+        text = text,
+        color = color,
+        modifier = Modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null
+        ) {
+            // If no word was previously selected or we want to reset
+            selectedWord = if (selectedWord.isEmpty()) {
+                text // Select entire text if no word was selected
+            } else {
+                "" // Deselect if already selected
+            }
+
+            onTextSelected(selectedWord.trim())
+        },
+        overflow = TextOverflow.Visible,
+    )
 }
 
 @Composable
@@ -338,6 +439,12 @@ fun AudioPlayer(
 ) {
     val speedOptions = listOf(0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f)
     var showSpeedMenu by remember { mutableStateOf(false) }
+
+    // Convert milliseconds to seconds for more intuitive display
+    val lengthSeconds = length / 1000
+    val currentPositionSeconds = (currentProgress * lengthSeconds)
+    val roundedCurrentPosition =
+        BigDecimal(currentPositionSeconds.toDouble()).setScale(0, RoundingMode.HALF_EVEN)
 
     Card(
         modifier = Modifier
@@ -369,14 +476,13 @@ fun AudioPlayer(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
+                // Display current time / total time in seconds
                 Text(
-                    text = String.format(Locale.US, "%.2f", currentProgress * 20) + "/" +
-                            length.toString(),
+                    text = "${roundedCurrentPosition}s / ${lengthSeconds}s",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
