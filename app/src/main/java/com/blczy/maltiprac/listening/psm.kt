@@ -12,7 +12,8 @@ import okhttp3.Request
 import java.io.File
 import java.io.FileOutputStream
 
-val indicesMap = mapOf(Category.Shopping to listOf(PsmDescriptor(R.string.psm_0_description, 0)))
+val indicesMap = mapOf(Category.Shopping to listOf(PsmDescriptor(R.string.psm_0_description, 0),
+    PsmDescriptor(R.string.psm_3_description, 3)))
 
 class PsmDescriptor(val descriptionStringIndex: Int, val index: Int) {}
 
